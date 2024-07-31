@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://gitee.com/mizhexiaoxiao/vue-fastapi-admin">
-    <img alt="Vue FastAPI Admin Logo" width="200" src="https://gitee.com/mizhexiaoxiao/vue-fastapi-admin/blob/main/deploy/sample-picture/logo.svg">
+    <img alt="Vue FastAPI Admin Logo" width="200" src="https://gitee.com/mizhexiaoxiao/vue-fastapi-admin/raw/main/deploy/sample-picture/logo.svg">
   </a>
 </p>
 
