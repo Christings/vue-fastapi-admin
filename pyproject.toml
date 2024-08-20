@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "vue-fastapi-admin"
 version = "0.1.0"
-description = "Vue Fastapi admin"
+description = "SE Tool Admin"
 authors = ["mizhexiaoxiao <mizhexiaoxiao@gmail.com>"]
 readme = "README.md"
 
