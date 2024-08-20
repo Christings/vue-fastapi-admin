@@ -71,7 +71,7 @@ const columns = [
   },
   {
     title: 'webhook名称',
-    key: 'project',
+    key: 'name',
     width: 'auto',
     align: 'center',
     ellipsis: { tooltip: true },
