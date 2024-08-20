@@ -5,7 +5,7 @@ class BaseWebhook(BaseModel):
     project: str = Field(..., description="项目名称", example="Teamhub")
     name: str = Field(..., description="webhook名称", example="apifox")
     webhook: str = Field("", description="webhook", example="webhook url")
-    switch: bool
+    switch: bool = Field(default=1, description="webhook", example="webhook url")
 
 class WebhookCreate(BaseWebhook):
     ...

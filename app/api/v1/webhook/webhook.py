@@ -61,7 +61,6 @@ async def delete_webhook(
 
 @router.post("/{project}/{name}", summary="监听Webhook")
 async def listen_webhook(
-    # webhook_id: int = Query(..., description="WebhookID"),
     text:dict,
     project: str = Path(description="项目名称"),
     name: str = Path(description="webhook名称"),

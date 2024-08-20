@@ -70,7 +70,14 @@ const columns = [
     ellipsis: { tooltip: true },
   },
   {
-    title: 'webhook',
+    title: 'webhook名称',
+    key: 'project',
+    width: 'auto',
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
+  {
+    title: 'webhook地址',
     key: 'webhook',
     align: 'center',
     width: 'auto',
@@ -186,6 +193,9 @@ const columns = [
       >
         <NFormItem label="项目名称" path="project">
           <NInput v-model:value="modalForm.project" clearable placeholder="请输入项目名称" />
+        </NFormItem>
+        <NFormItem label="webhook名称" path="name">
+          <NInput v-model:value="modalForm.name" clearable placeholder="请输入webhook名称" />
         </NFormItem>
         <NFormItem label="Webhook" path="webhook">
           <NInput v-model:value="modalForm.webhook" type="textarea" clearable />
