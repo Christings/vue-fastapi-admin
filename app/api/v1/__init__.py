@@ -9,6 +9,7 @@ from .menus import menus_router
 from .roles import roles_router
 from .users import users_router
 from .auditlog import auditlog_router
+from .webhook import webhook_router
 
 v1_router = APIRouter()
 
