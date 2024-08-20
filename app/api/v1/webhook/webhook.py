@@ -59,21 +59,22 @@ async def delete_webhook(
     return Success(msg="Deleted Success")
 
 
-@router.post("/listen/{project}", summary="监听Webhook")
+@router.post("/{project}/{name}", summary="监听Webhook")
 async def listen_webhook(
     # webhook_id: int = Query(..., description="WebhookID"),
     text:dict,
-    project: str = Path(description="Webhook名称"),
+    project: str = Path(description="项目名称"),
+    name: str = Path(description="webhook名称"),
 ):
     q = Q()
     if project:
         q &= Q(project=project)
+    if name:
+        q &= Q(name=name)
 
-    # total, webhook_objs = await webhook_controller.list(page=page, page_size=page_size, search=q)
-    total, webhook_objs = await webhook_controller.list(page=1, page_size=100,search=q)
+    webhook_objs = await webhook_controller.get_by_uk(search=q)
     data = [await obj.to_dict(m2m=True) for obj in webhook_objs]
 
-    print(data)
 
     content=text.get("content",None)
     if not content:
@@ -104,19 +105,9 @@ async def listen_webhook(
 
     for i in data:
         if i["project"] == project:
-
+            url=i["webhook"]
             async with httpx.AsyncClient() as client:
-                resp = await client.post('https://mchat.mosaic.sec.samsung.net/hooks/hi1nb5d1birubba8zhet7upyco', json=message)
-            # result = resp.json()
-                print(resp.status_code)
-    # res=requests.post("https://mchat.mosaic.sec.samsung.net/hooks/hi1nb5d1birubba8zhet7upyco", data=json.dumps(payload), headers={'Content-Type': 'application/json'})
-
-    # res = httpx.post("https://mchat.mosaic.sec.samsung.net/hooks/1n9fc7gyjbggxkewcfuwzamaih", json="message")
-    # print(res.url)
-    # print(res.text)
-    # print(res.content)
-    return {"result": resp.url}
-    # return {"result": "res.text"}
-
-    # await webhook_controller.delete_webhook(webhook_id=webhook_id)
-    # return Success(msg="Deleted Success")
+                resp = await client.post(url, json=message)
+                return Success(msg="Send Success")
+    
+    return Success(msg="Send None")
