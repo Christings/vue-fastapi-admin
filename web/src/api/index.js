@@ -38,4 +38,9 @@ export default {
   deleteDept: (params = {}) => request.delete('/dept/delete', { params }),
   // auditlog
   getAuditLogList: (params = {}) => request.get('/auditlog/list', { params }),
+  // webhook
+  getWebhooks: (params = {}) => request.get('/webhook/list', { params }),
+  createWebhook: (data = {}) => request.post('/webhook/create', data),
+  updateWebhook: (data = {}) => request.post('/webhook/update', data),
+  deleteWebhook: (params = {}) => request.delete('/webhook/delete', { params }),
 }
