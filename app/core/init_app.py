@@ -152,7 +152,18 @@ async def init_menus():
                 is_hidden=False,
                 component="/system/auditlog",
                 keepalive=False,
-            )
+            ),
+            Menu(
+                menu_type=MenuType.MENU,
+                name="Webhook管理",
+                path="webhook",
+                order=7,
+                parent_id=parent_menu.id,
+                icon="material-symbols:person-outline-rounded",
+                is_hidden=False,
+                component="/system/webhook",
+                keepalive=False,
+            ),
         ]
         await Menu.bulk_create(children_menu)
         parent_menu = await Menu.create(
