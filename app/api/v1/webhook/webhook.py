@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query,Path
 
 from app.controllers.webhook import webhook_controller
-from app.schemas import Success,SuccessExtra
+from app.schemas import Success,SuccessExtra,Fail
 from app.schemas.webhook import *
 
 from tortoise.expressions import Q
@@ -74,39 +74,43 @@ async def listen_webhook(
     webhook_objs = await webhook_controller.get_by_uk(search=q)
     data = [await obj.to_dict(m2m=True) for obj in webhook_objs]
 
-
-    content=text.get("content",None)
-    if not content:
-        return {"result": "fail"}
-    
-    content = content.split("\n")
-    fields = []
-    for i in content:
-        fields.append({"short": False,
-                        "title": i,
-                        "value": ""})
-
     message = {
-            "attachments": [
-                {
-                    "fallback": "test",
-                    "color": "#FF8000",
-                    # "pretext": "This is noma project.",
-                    # "author_name": "Mattermost",
-                    # "author_icon": "https://mattermost.com/wp-content/uploads/2022/02/icon_WS.png",
-                    # "author_link": "https://mattermost.org/",
-                    "title": text["event"]+":"+text["title"],
-                }
-            ]
-        }
+                "attachments": [
+                    {
+                        "fallback": "test",
+                        "color": "#FF8000",
+                        # "pretext": "This is noma project.",
+                        # "author_name": "Mattermost",
+                        # "author_icon": "https://mattermost.com/wp-content/uploads/2022/02/icon_WS.png",
+                        # "author_link": "https://mattermost.org/",
+                        # "title": text["event"]+":"+text["title"],
+                    }
+                ]
+            }
 
-    message["attachments"][0]["fields"] = fields
+    if name=="apifox":
+        content=text.get("content",None)
+        if not content:
+            return Fail(msg="Data Exception")
+
+        
+        content = content.split("\n")
+        fields = []
+        for i in content:
+            fields.append({"short": False, "title": i, "value": ""})
+
+        message["attachments"][0]["tile"] = text["event"]+":"+text["title"]
+        message["attachments"][0]["fields"] = fields
+    else:
+        if isinstance(text, bytes):
+            text = text.decode("utf-8")
+        message["attachments"][0]["title"] = text
 
     for i in data:
         if i["project"] == project:
             url=i["webhook"]
             async with httpx.AsyncClient() as client:
                 resp = await client.post(url, json=message)
-                return Success(msg="Send Success")
+                return Success(msg="Listen Successfully", data=resp.text)
     
-    return Success(msg="Send None")
+    return Success(msg="Listen Successfully", data=None)

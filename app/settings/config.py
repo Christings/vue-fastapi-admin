@@ -16,20 +16,37 @@ class Settings(BaseSettings):
     CORS_ALLOW_HEADERS: typing.List = ["*"]
 
     DEBUG: bool = True
-    DB_URL: str = "sqlite://db.sqlite3"
+    # mysql
+    DB_URL: str = "mysql+pymysql://root:12345678@127.0.0.1:3306/se_tool_admin"
     DB_CONNECTIONS: dict = {
         "default": {
-            "engine": "tortoise.backends.sqlite",
+            "engine": "tortoise.backends.mysql",
             "db_url": DB_URL,
             "credentials": {
-                "host": "",
-                "port": "",
-                "user": "",
-                "password": "",
-                "database": "",
+                "host": "127.0.0.1",
+                "port": 3306,
+                "user": "root",
+                "password": "12345678",
+                "database": "se_tool_admin",
+                "charset": "utf8mb4",
             },
         },
     }
+    # sqlite
+    # DB_URL: str = "sqlite://db.sqlite3"
+    # DB_CONNECTIONS: dict = {
+    #     "default": {
+    #         "engine": "tortoise.backends.sqlite",
+    #         "db_url": DB_URL,
+    #         "credentials": {
+    #             "host": "",
+    #             "port": "",
+    #             "user": "",
+    #             "password": "",
+    #             "database": "",
+    #         },
+    #     },
+    # }
 
     PROJECT_ROOT: str = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     BASE_DIR: str = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir))
@@ -39,15 +56,33 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 24 * 7  # 7 day
     TORTOISE_ORM: dict = {
         "connections": {
-            "sqlite": {
-                "engine": "tortoise.backends.sqlite",
-                "credentials": {"file_path": f"{BASE_DIR}/db.sqlite3"},
-            }
+            # sqlite
+            # "sqlite": {
+            #     "engine": "tortoise.backends.sqlite",
+            #     "credentials": {"file_path": f"{BASE_DIR}/db.sqlite3"},
+            # }
+
+            # mysql
+            "mysql": {
+                "engine": "tortoise.backends.mysql",
+                "credentials": {
+                    'host': '127.0.0.1',
+                    'port': '3306',
+                    'user': 'root',
+                    'password': '12345678',
+                    'database': 'se_tool_admin',
+                    'minsize': 1,
+                    'maxsize': 5,
+                    'charset': 'utf8mb4',
+                    'echo': True
+                    },
+                }
         },
         "apps": {
             "models": {
                 "models": ["app.models"],
-                "default_connection": "sqlite",
+                # "default_connection": "sqlite",
+                "default_connection": "mysql",
             },
         },
         "use_tz": False,
