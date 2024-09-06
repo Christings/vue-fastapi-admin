@@ -1,8 +1,10 @@
+aiomysql==0.2.0
 aiosqlite==0.17.0
 annotated-types==0.6.0
 anyio==4.3.0
 argon2-cffi==23.1.0
 argon2-cffi-bindings==21.2.0
+asyncmy==0.2.9
 black==23.12.1
 blinker==1.7.0
 certifi==2024.2.2
@@ -45,6 +47,7 @@ pydantic-settings==2.2.1
 pydantic_core==2.18.2
 Pygments==2.18.0
 PyJWT==2.8.0
+PyMySQL==1.1.1
 pypika-tortoise==0.1.6
 pyproject_hooks==1.0.0
 python-dotenv==1.0.1
