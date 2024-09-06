@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Query,Path
+from fastapi import APIRouter, Query, Path
 
+from typing import Union
 from app.controllers.webhook import webhook_controller
-from app.schemas import Success,SuccessExtra,Fail
+from app.schemas import Success, SuccessExtra, Fail
 from app.schemas.webhook import *
 
 from tortoise.expressions import Q
@@ -25,6 +26,7 @@ async def list_webhook(
     total, webhook_objs = await webhook_controller.list(page=page, page_size=page_size, search=q)
     data = [await obj.to_dict(m2m=True) for obj in webhook_objs]
     return SuccessExtra(data=data, total=total, page=page, page_size=page_size)
+
 
 @router.get("/get", summary="查看Webhook")
 async def get_webhook(
@@ -61,7 +63,8 @@ async def delete_webhook(
 
 @router.post("/{project}/{name}", summary="监听Webhook")
 async def listen_webhook(
-    text:dict,
+    query: Union[str, bytes, None] = Query(default=None),
+    body: Union[dict, str, bytes, None] = None,
     project: str = Path(description="项目名称"),
     name: str = Path(description="webhook名称"),
 ):
@@ -75,42 +78,62 @@ async def listen_webhook(
     data = [await obj.to_dict(m2m=True) for obj in webhook_objs]
 
     message = {
-                "attachments": [
-                    {
-                        "fallback": "test",
-                        "color": "#FF8000",
-                        # "pretext": "This is noma project.",
-                        # "author_name": "Mattermost",
-                        # "author_icon": "https://mattermost.com/wp-content/uploads/2022/02/icon_WS.png",
-                        # "author_link": "https://mattermost.org/",
-                        # "title": text["event"]+":"+text["title"],
-                    }
-                ]
+        "attachments": [
+            {
+                "fallback": "test",
+                "color": "#FF8000",
+                # "pretext": "This is noma project.",
+                # "author_name": "Mattermost",
+                # "author_icon": "https://mattermost.com/wp-content/uploads/2022/02/icon_WS.png",
+                # "author_link": "https://mattermost.org/",
+                # "title": text["event"]+":"+text["title"],
             }
+        ]
+    }
 
-    if name=="apifox":
-        content=text.get("content",None)
+    if name == "apifox":
+        content = body.get("content", None)
         if not content:
-            return Fail(msg="Data Exception")
+            return Fail(msg="The data passed by apifox is empty")
 
-        
         content = content.split("\n")
         fields = []
         for i in content:
             fields.append({"short": False, "title": i, "value": ""})
 
-        message["attachments"][0]["tile"] = text["event"]+":"+text["title"]
-        message["attachments"][0]["fields"] = fields
+        if fields:
+            message["attachments"][0]["fields"] = fields
+
+        event = body.get("event", None)
+        title = body.get("title", None)
+        if event and title:
+            message["attachments"][0]["tile"] = event+":"+title
+        elif event and not title:
+            message["attachments"][0]["tile"] = event
+        elif not event and title:
+            message["attachments"][0]["tile"] = title
+
+    elif name == "metersphere":
+        if isinstance(query, bytes):
+            query = query.decode("utf-8")
+            message["attachments"][0]["title"] = query
+        else:
+            message["attachments"][0]["title"] = str(query)
     else:
-        if isinstance(text, bytes):
-            text = text.decode("utf-8")
-        message["attachments"][0]["title"] = text
+        if query:
+            if isinstance(query, bytes):
+                query = query.decode("utf-8")
+            message["attachments"][0]["title"] = str(query)
+        if body:
+            if isinstance(body, bytes):
+                body = body.decode("utf-8")
+            message["attachments"][0]["fields"] = str(body)
 
     for i in data:
         if i["project"] == project:
-            url=i["webhook"]
+            url = i["webhook"]
             async with httpx.AsyncClient() as client:
                 resp = await client.post(url, json=message)
                 return Success(msg="Listen Successfully", data=resp.text)
-    
+
     return Success(msg="Listen Successfully", data=None)
