@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Query, Path
+import json
 
-from typing import Union
+from fastapi import APIRouter, Query, Path, Request
+
 from app.controllers.webhook import webhook_controller
+from app.log import logger
 from app.schemas import Success, SuccessExtra, Fail
 from app.schemas.webhook import *
 
@@ -63,11 +65,12 @@ async def delete_webhook(
 
 @router.post("/{project}/{name}", summary="监听Webhook")
 async def listen_webhook(
-    query: Union[str, bytes, None] = Query(default=None),
-    body: Union[dict, str, bytes, None] = None,
+    request: Request,
     project: str = Path(description="项目名称"),
     name: str = Path(description="webhook名称"),
 ):
+    params = await request.body()
+    logger.info(f"Listen Webhook: body={params}, project={project}, name={name}")
     q = Q()
     if project:
         q &= Q(project=project)
@@ -92,7 +95,8 @@ async def listen_webhook(
     }
 
     if name == "apifox":
-        content = body.get("content", None)
+        params=json.loads(params)
+        content = params.get("content", None)
         if not content:
             return Fail(msg="The data passed by apifox is empty")
 
@@ -104,8 +108,8 @@ async def listen_webhook(
         if fields:
             message["attachments"][0]["fields"] = fields
 
-        event = body.get("event", None)
-        title = body.get("title", None)
+        event = params.get("event", None)
+        title = params.get("title", None)
         if event and title:
             message["attachments"][0]["tile"] = event+":"+title
         elif event and not title:
@@ -114,21 +118,18 @@ async def listen_webhook(
             message["attachments"][0]["tile"] = title
 
     elif name == "metersphere":
-        if isinstance(query, bytes):
-            query = query.decode("utf-8")
-            message["attachments"][0]["title"] = query
+        if isinstance(params, bytes):
+            params = params.decode("utf-8")
+            message["attachments"][0]["title"] = params
         else:
-            message["attachments"][0]["title"] = str(query)
+            message["attachments"][0]["title"] = str(params)
     else:
-        if query:
-            if isinstance(query, bytes):
-                query = query.decode("utf-8")
-            message["attachments"][0]["title"] = str(query)
-        if body:
-            if isinstance(body, bytes):
-                body = body.decode("utf-8")
-            message["attachments"][0]["fields"] = str(body)
+        if params:
+            if isinstance(params, bytes):
+                params = params.decode("utf-8")
+            message["attachments"][0]["title"] = str(params)
 
+    logger.info(f"Listen Webhook: message={message}")
     for i in data:
         if i["project"] == project:
             url = i["webhook"]
