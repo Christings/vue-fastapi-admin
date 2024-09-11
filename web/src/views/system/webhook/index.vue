@@ -41,6 +41,11 @@ const {
 
 const webhookOption = ref([])
 const isDisabled = ref(false)
+const options = ref([
+  { label: 'apifox', value: 'apifox' },
+  { label: 'metersphere', value: 'metersphere' },
+  { label: 'other', value: 'other' },
+])
 
 onMounted(() => {
   $table.value?.handleSearch()
@@ -53,6 +58,16 @@ const webhookRules = {
       required: true,
       message: '请输入项目名称',
       trigger: ['input', 'blur', 'change'],
+    },
+  ],
+  name: [
+    {
+      required: true,
+    },
+  ],
+  webhook: [
+    {
+      required: true,
     },
   ],
 }
@@ -91,7 +106,7 @@ const columns = [
     },
   },
   {
-    title: 'webhook名称',
+    title: 'webhook类型',
     key: 'name',
     width: 'auto',
     align: 'center',
@@ -215,10 +230,13 @@ const columns = [
         <NFormItem label="项目名称" path="project">
           <NInput v-model:value="modalForm.project" clearable placeholder="请输入项目名称" />
         </NFormItem>
-        <NFormItem label="webhook名称" path="name">
-          <NInput v-model:value="modalForm.name" clearable placeholder="请输入webhook名称" />
+        <NFormItem label="webhook类型" path="name">
+          <n-select v-model:value="modalForm.name" :options="options"></n-select>
         </NFormItem>
-        <NFormItem label="Webhook" path="webhook">
+        <!-- <NFormItem label="webhook名称" path="name">
+          <NInput v-model:value="modalForm.name" clearable placeholder="请输入webhook名称" />
+        </NFormItem> -->
+        <NFormItem label="webhook" path="webhook">
           <NInput v-model:value="modalForm.webhook" type="textarea" clearable />
         </NFormItem>
       </NForm>
