@@ -2,8 +2,8 @@ from tortoise.expressions import Q
 from tortoise.transactions import atomic
 
 from app.core.crud import CRUDBase
-from app.models.webhook import Webhook
-from app.schemas.webhook import WebhookCreate, WebhookUpdate
+from app.models.webhook import Webhook, WebhookTest
+from app.schemas.webhook import WebhookCreate, WebhookUpdate, WebhookTestCreate, WebhookTestUpdate
 
 
 class WebhookController(CRUDBase[Webhook, WebhookCreate, WebhookUpdate]):
@@ -33,4 +33,19 @@ class WebhookController(CRUDBase[Webhook, WebhookCreate, WebhookUpdate]):
         await Webhook.filter(id=obj.id).delete()
 
 
+class WebhookTestController(CRUDBase[WebhookTest, WebhookTestCreate, WebhookTestUpdate]):
+    def __init__(self):
+        super().__init__(model=WebhookTest)
+
+    async def get_webhook_info(self):
+        pass
+
+    @atomic()
+    async def create_webhook_test(self, obj_in: WebhookTestCreate):
+        # 创建webhook_test
+        obj = await self.create(obj_in=obj_in)
+        return obj
+
+
 webhook_controller = WebhookController()
+webhook_test_controller = WebhookTestController()

@@ -2,7 +2,7 @@ import json
 
 from fastapi import APIRouter, Query, Path, Request
 
-from app.controllers.webhook import webhook_controller
+from app.controllers.webhook import webhook_controller, webhook_test_controller
 from app.log import logger
 from app.schemas import Success, SuccessExtra, Fail
 from app.schemas.webhook import *
@@ -70,7 +70,8 @@ async def listen_webhook(
     name: str = Path(description="webhook名称"),
 ):
     params = await request.body()
-    logger.info(f"Listen Webhook: body={params}, project={project}, name={name}")
+    logger.info(
+        f"Listen Webhook: body={params}, project={project}, name={name}")
     q = Q()
     if project:
         q &= Q(project=project)
@@ -95,7 +96,7 @@ async def listen_webhook(
     }
 
     if name == "apifox":
-        params=json.loads(params)
+        params = json.loads(params)
         content = params.get("content", None)
         if not content:
             return Fail(msg="The data passed by apifox is empty")
@@ -132,9 +133,29 @@ async def listen_webhook(
     logger.info(f"Listen Webhook: message={message}")
     for i in data:
         if i["project"] == project:
+            webhook_test_obj = WebhookTestCreate(
+                webhook_id=i["id"], project=i["project"], name=i["name"], ret=params)
+            await webhook_test_controller.create_webhook_test(webhook_test_obj)
+
             url = i["webhook"]
             async with httpx.AsyncClient() as client:
                 resp = await client.post(url, json=message)
                 return Success(msg="Listen Successfully", data=resp.text)
 
     return Success(msg="Listen Successfully", data=None)
+
+
+@router.get("/test/list", summary="查看Webhook测试结果列表")
+async def list_webhook_test(
+    page: int = Query(1, description="页码"),
+    page_size: int = Query(10, description="每页数量"),
+    webhook_id: str = Query(None, description="Webhook id"),
+
+):
+    q = Q()
+    if webhook_id:
+        q &= Q(webhook_id__contains=webhook_id)
+
+    total, webhook_test_objs = await webhook_test_controller.list(page=page, page_size=page_size, search=q)
+    data = [await obj.to_dict(m2m=True) for obj in webhook_test_objs]
+    return SuccessExtra(data=data, total=total, page=page, page_size=page_size)

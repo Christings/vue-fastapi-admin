@@ -50,7 +50,8 @@ def register_exceptions(app: FastAPI):
     app.add_exception_handler(HTTPException, HttpExcHandle)
     app.add_exception_handler(IntegrityError, IntegrityHandle)
     app.add_exception_handler(RequestValidationError, RequestValidationHandle)
-    app.add_exception_handler(ResponseValidationError, ResponseValidationHandle)
+    app.add_exception_handler(ResponseValidationError,
+                              ResponseValidationHandle)
 
 
 def register_routers(app: FastAPI, prefix: str = "/api"):
@@ -162,6 +163,17 @@ async def init_menus():
                 icon="material-symbols:person-outline-rounded",
                 is_hidden=False,
                 component="/system/webhook",
+                keepalive=False,
+            ),
+            Menu(
+                menu_type=MenuType.MENU,
+                name="WebhookDetail",
+                path="webhookDetail",
+                order=8,
+                parent_id=parent_menu.id,
+                icon="material-symbols:person-outline-rounded",
+                is_hidden=True,
+                component="/system/webhook/detail",
                 keepalive=False,
             ),
         ]
