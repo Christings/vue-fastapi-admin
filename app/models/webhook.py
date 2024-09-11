@@ -19,7 +19,7 @@ class WebhookTest(BaseModel, TimestampMixin):
     webhook_id = fields.BigIntField(description="部门ID", index=True)
     project = fields.CharField(max_length=64, description="项目名称", index=True)
     name = fields.CharField(max_length=64, description="webhook名称", index=True)
-    ret = fields.CharField(max_length=50000, description="结果", index=True)
+    ret = fields.TextField(description="结果")
 
     class Meta:
         table = "webhook_test"
