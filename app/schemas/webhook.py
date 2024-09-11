@@ -21,7 +21,7 @@ class WebhookUpdate(BaseWebhook):
 
 
 class BaseWebhookTest(BaseModel):
-    Webhook_id: int = Field(..., description="webhook id")
+    webhook_id: int = Field(..., description="webhook id")
     project: str = Field(..., description="项目名称", example="Teamhub")
     name: str = Field(..., description="webhook名称", example="apifox")
     ret: str = Field(..., description="结果")
@@ -29,6 +29,7 @@ class BaseWebhookTest(BaseModel):
 
 class WebhookTestCreate(BaseWebhookTest):
     pass
+
 
 class WebhookTestUpdate(BaseWebhookTest):
     id: int

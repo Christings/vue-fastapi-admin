@@ -134,7 +134,7 @@ async def listen_webhook(
     for i in data:
         if i["project"] == project:
             webhook_test_obj = WebhookTestCreate(
-                webhook_id=i["id"], project=i["project"], name=i["name"], ret=params)
+                webhook_id=i["id"], project=i["project"], name=i["name"], ret=str(params))
             await webhook_test_controller.create_webhook_test(webhook_test_obj)
 
             url = i["webhook"]
