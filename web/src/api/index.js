@@ -43,4 +43,10 @@ export default {
   createWebhook: (data = {}) => request.post('/webhook/create', data),
   updateWebhook: (data = {}) => request.post('/webhook/update', data),
   deleteWebhook: (params = {}) => request.delete('/webhook/delete', { params }),
+  getWebhookTests: (params = {}) => request.get('/webhook/test/list', { params }),
+  // test
+  getTests: (params = {}) => request.get('/test/list', { params }),
+  createTest: (data = {}) => request.post('/test/create', data),
+  updateTest: (data = {}) => request.post('/test/update', data),
+  deleteTest: (params = {}) => request.delete('/test/delete', { params }),
 }

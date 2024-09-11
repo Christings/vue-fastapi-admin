@@ -7,6 +7,7 @@ import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
 import CrudModal from '@/components/table/CrudModal.vue'
 import CrudTable from '@/components/table/CrudTable.vue'
 import TheIcon from '@/components/icon/TheIcon.vue'
+import { router } from '@/router'
 
 import { renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -68,6 +69,26 @@ const columns = [
     width: 'auto',
     align: 'center',
     ellipsis: { tooltip: true },
+    render(row) {
+      return h(
+        'router-link',
+        // 'a',
+        {
+          style: {
+            color: 'orange',
+            cursor: 'pointer',
+          },
+
+          // href: '/system/webhookDetail',
+          // target: '_blank',
+
+          onClick: () => {
+            router.push({ path: '/system/webhookDetail', query: { id: row.id } })
+          },
+        },
+        row.project
+      )
+    },
   },
   {
     title: 'webhook名称',
